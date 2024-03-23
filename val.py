@@ -1,24 +1,3 @@
-# YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
-"""
-Validate a trained YOLOv5 detection model on a detection dataset.
-
-Usage:
-    $ python val.py --weights yolov5s.pt --data coco128.yaml --img 640
-
-Usage - formats:
-    $ python val.py --weights yolov5s.pt                 # PyTorch
-                              yolov5s.torchscript        # TorchScript
-                              yolov5s.onnx               # ONNX Runtime or OpenCV DNN with --dnn
-                              yolov5s_openvino_model     # OpenVINO
-                              yolov5s.engine             # TensorRT
-                              yolov5s.mlmodel            # CoreML (macOS-only)
-                              yolov5s_saved_model        # TensorFlow SavedModel
-                              yolov5s.pb                 # TensorFlow GraphDef
-                              yolov5s.tflite             # TensorFlow Lite
-                              yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
-                              yolov5s_paddle_model       # PaddlePaddle
-"""
-
 import argparse
 import json
 import os
@@ -365,9 +344,9 @@ def run(
 def parse_opt():
     """Parses command-line options for YOLOv5 model inference configuration."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
+    parser.add_argument("--data", type=str, default=ROOT / "data/data.yaml", help="data.yaml path")
     parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "yolov5s.pt", help="model path(s)")
-    parser.add_argument("--batch-size", type=int, default=32, help="batch size")
+    parser.add_argument("--batch-size", type=int, default=16, help="batch size")
     parser.add_argument("--imgsz", "--img", "--img-size", type=int, default=640, help="inference size (pixels)")
     parser.add_argument("--conf-thres", type=float, default=0.001, help="confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.6, help="NMS IoU threshold")

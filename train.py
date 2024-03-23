@@ -1,19 +1,3 @@
-# YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
-"""
-Train a YOLOv5 model on a custom dataset. Models and datasets download automatically from the latest YOLOv5 release.
-
-Usage - Single-GPU training:
-    $ python train.py --data coco128.yaml --weights yolov5s.pt --img 640  # from pretrained (recommended)
-    $ python train.py --data coco128.yaml --weights '' --cfg yolov5s.yaml --img 640  # from scratch
-
-Usage - Multi-GPU DDP training:
-    $ python -m torch.distributed.run --nproc_per_node 4 --master_port 1 train.py --data coco128.yaml --weights yolov5s.pt --img 640 --device 0,1,2,3
-
-Models:     https://github.com/ultralytics/yolov5/tree/master/models
-Datasets:   https://github.com/ultralytics/yolov5/tree/master/data
-Tutorial:   https://docs.ultralytics.com/yolov5/tutorials/train_custom_data
-"""
-
 import argparse
 import math
 import os
@@ -26,7 +10,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 try:
-    import comet_ml  # must be imported before torch (if installed)
+    import comet_ml
 except ImportError:
     comet_ml = None
 
@@ -101,12 +85,7 @@ GIT_INFO = check_git_info()
 
 
 def train(hyp, opt, device, callbacks):
-    """
-    Trains YOLOv5 model with given hyperparameters, options, and device, managing datasets, model architecture, loss
-    computation, and optimizer steps.
 
-    `hyp` argument is path/to/hyp.yaml or hyp dictionary.
-    """
     save_dir, epochs, batch_size, weights, single_cls, evolve, data, cfg, resume, noval, nosave, workers, freeze = (
         Path(opt.save_dir),
         opt.epochs,
@@ -240,8 +219,7 @@ def train(hyp, opt, device, callbacks):
     # DP mode
     if cuda and RANK == -1 and torch.cuda.device_count() > 1:
         LOGGER.warning(
-            "WARNING ⚠️ DP not recommended, use torch.distributed.run for best DDP Multi-GPU results.\n"
-            "See Multi-GPU Tutorial at https://docs.ultralytics.com/yolov5/tutorials/multi_gpu_training to get started."
+            "WARNING ⚠️ DP not recommended, use torch.distributed.run for best DDP Multi-GPU results."
         )
         model = torch.nn.DataParallel(model)
 
@@ -341,9 +319,6 @@ def train(hyp, opt, device, callbacks):
             iw = labels_to_image_weights(dataset.labels, nc=nc, class_weights=cw)  # image weights
             dataset.indices = random.choices(range(dataset.n), weights=iw, k=dataset.n)  # rand weighted idx
 
-        # Update mosaic border (optional)
-        # b = int(random.uniform(0.25 * imgsz, 0.75 * imgsz + gs) // gs * gs)
-        # dataset.mosaic_border = [b - imgsz, -b]  # height, width borders
 
         mloss = torch.zeros(3, device=device)  # mean losses
         if RANK != -1:
@@ -515,9 +490,9 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", type=str, default=ROOT / "yolov5s.pt", help="initial weights path")
     parser.add_argument("--cfg", type=str, default="", help="model.yaml path")
-    parser.add_argument("--data", type=str, default=ROOT / "data/coco128.yaml", help="dataset.yaml path")
+    parser.add_argument("--data", type=str, default=ROOT / "data/data.yaml", help="data.yaml path")
     parser.add_argument("--hyp", type=str, default=ROOT / "data/hyps/hyp.scratch-low.yaml", help="hyperparameters path")
-    parser.add_argument("--epochs", type=int, default=100, help="total training epochs")
+    parser.add_argument("--epochs", type=int, default=1, help="total training epochs")
     parser.add_argument("--batch-size", type=int, default=16, help="total batch size for all GPUs, -1 for autobatch")
     parser.add_argument("--imgsz", "--img", "--img-size", type=int, default=640, help="train, val image size (pixels)")
     parser.add_argument("--rect", action="store_true", help="rectangular training")
@@ -822,7 +797,7 @@ def main(opt, callbacks=Callbacks()):
 
 
 def generate_individual(input_ranges, individual_length):
-    """Generates a list of random values within specified input ranges for each gene in the individual."""
+
     individual = []
     for i in range(individual_length):
         lower_bound, upper_bound = input_ranges[i]
@@ -831,11 +806,7 @@ def generate_individual(input_ranges, individual_length):
 
 
 def run(**kwargs):
-    """
-    Executes YOLOv5 training with given options, overriding with any kwargs provided.
 
-    Example: import train; train.run(data='coco128.yaml', imgsz=320, weights='yolov5m.pt')
-    """
     opt = parse_opt(True)
     for k, v in kwargs.items():
         setattr(opt, k, v)
